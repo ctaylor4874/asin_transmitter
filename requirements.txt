@@ -1,8 +1,5 @@
 appdirs==1.4.3
 boto==2.46.1
 packaging==16.8
-public==0.0.0
 pyparsing==2.2.0
-query-string==0.0.0
-setupfiles==0.0.0
 six==1.10.0
