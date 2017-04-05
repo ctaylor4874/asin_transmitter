@@ -1,6 +1,8 @@
 import webbrowser
 import os
+import time
 from contextlib import closing
+
 from boto import sqs
 
 BOTO_REGION = 'us-east-1'
@@ -14,17 +16,16 @@ URL = 'https://www.amazon.com/product/dp/{}'
 
 
 def get_asin_from_queue():
+    queue_name = '{}-{}'.format(BOTO_QUEUE_NAME, BROADCAST_CHANNEL)
     with closing(sqs.connect_to_region(BOTO_REGION,
                                        aws_access_key_id=AWS_ACCESS_KEY,
                                        aws_secret_access_key=AWS_SECRET_KEY)) as connection:
-        queue = connection.get_queue(BOTO_QUEUE_NAME)
-        messages = queue.get_messages(message_attributes=['broadcast_channel'])
-        if messages:
-            for message in messages:
-                if message.message_attributes['broadcast_channel']['string_value'] == BROADCAST_CHANNEL:
-                    body = message.get_body()
-                    message.delete()
-                    return body
+        queue = connection.get_queue(queue_name)
+        message = queue.read()
+        if message:
+            body = message.get_body()
+            message.delete()
+            return body
         return
 
 
